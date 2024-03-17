@@ -1,0 +1,71 @@
+name: Build ROM for Marble
+on:
+  workflow_dispatch:
+    inputs:
+      URL:
+        description: "移植包下载地址"
+        required: true
+      VENDOR_URL:
+        description: "底包下载地址"
+        required: true
+        default: 'https://cdn-ota.azureedge.net/OS1.0.2.0.UMRCNXM/miui_MARBLE_OS1.0.2.0.UMRCNXM_65288a855a_14.0.zip'
+      IMAGE_TYPE:
+        description: "IMAGE 格式"
+        required: true
+        default: 'erofs'
+        type: choice
+        options:
+        - erofs
+        - ext4
+      EXT_RW:
+        description: 'EXT4 可读写'
+        required: true
+        type: boolean
+      OFFICIAL_BOOT:
+        description: '使用官方 BOOT'
+        required: true
+        type: boolean
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 最大化构建环境
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 8192
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+      - name: 检出仓库文件
+        uses: actions/checkout@main
+        with:
+          repository: Kyuofox/Action_Build_Marble_ROM
+          token: ${{ secrets.PRIVATE_TOKEN }}
+      - name: 准备所需环境
+        run: |
+          sudo timedatectl set-timezone Asia/Shanghai
+          sudo apt-get install python3 aria2 p7zip-full zstd
+      - name: 构建 ROM
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} ${{ github.event.inputs.OFFICIAL_BOOT }} $GITHUB_ENV $GITHUB_WORKSPACE
+      - name: 处理 ROM
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
+          cd "$GITHUB_WORKSPACE"/GithubRelease
+          sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/"${{ env.rom_name }}" "${{ env.rom_name }}"
+          cd "$GITHUB_WORKSPACE"
+          touch file.log
+          echo -e "移植机型: ${{ env.model }}\n移植版本: ${{ env.origin_os_version }}\n安全补丁: ${{ env.security_patch }}\n基线版本: ${{ env.baseline }}\n底包版本: ${{ env.vendor_os_version }}" > file.log
+      - name: 上传到 Github Release
+        uses: ncipollo/release-action@main
+        with:
+          artifacts: ${{ github.workspace }}/GithubRelease/*
+          name: "${{ env.origin_os_version }}"
+          tag: "${{ env.origin_os_version }}"
+          bodyFile: "${{ github.workspace }}/file.log"
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          token: ${{ secrets.GITHUB_TOKEN }}
