@@ -8,7 +8,7 @@ on:
       VENDOR_URL:
         description: "底包下载地址"
         required: true
-        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS1.0.2.0.UMRCNXM/miui_MARBLE_OS1.0.2.0.UMRCNXM_65288a855a_14.0.zip'
+        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS1.0.3.0.UMRCNXM/miui_MARBLE_OS1.0.3.0.UMRCNXM_20479f8881_14.0.zip'
       IMAGE_TYPE:
         description: "IMAGE 格式"
         required: true
@@ -47,7 +47,7 @@ jobs:
       - name: 准备所需环境
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
-          sudo apt-get install python3 aria2 p7zip-full zstd
+          sudo apt-get install python3 python3-pip aria2 p7zip-full zstd
       - name: 构建 ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} ${{ github.event.inputs.OFFICIAL_BOOT }} $GITHUB_ENV $GITHUB_WORKSPACE
