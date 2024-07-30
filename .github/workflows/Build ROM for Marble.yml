@@ -69,10 +69,3 @@ jobs:
           allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: 上传到 OneDrive
-        run: |
-          sudo -v ; curl https://rclone.org/install.sh | sudo bash
-          mkdir -p ~/.config/rclone/
-          echo ${{ secrets.RCLONE_CONFIG }} > base64.txt
-          base64 --decode base64.txt > ~/.config/rclone/rclone.conf
-          rclone copy -P "$GITHUB_WORKSPACE"/zip/${{ env.rom_name }} od:/HyperOS-Porting
