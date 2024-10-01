@@ -21,10 +21,6 @@ on:
         description: 'EXT4 可读写'
         required: true
         type: boolean
-      OFFICIAL_BOOT:
-        description: '使用官方 BOOT'
-        required: true
-        type: boolean
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -50,7 +46,7 @@ jobs:
           sudo apt-get install python3 python3-pip aria2 p7zip-full zstd
       - name: 构建 ROM
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} ${{ github.event.inputs.OFFICIAL_BOOT }} $GITHUB_ENV $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} $GITHUB_ENV $GITHUB_WORKSPACE
       - name: 处理 ROM
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
