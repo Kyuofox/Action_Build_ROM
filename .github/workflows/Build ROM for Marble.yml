@@ -8,7 +8,7 @@ on:
       VENDOR_URL:
         description: "底包下载地址"
         required: true
-        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS1.0.7.0.UMRCNXM/miui_MARBLE_OS1.0.7.0.UMRCNXM_a87408032e_14.0.zip'
+        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS1.0.9.0.UMRCNXM/miui_MARBLE_OS1.0.9.0.UMRCNXM_b344a079ab_14.0.zip'
       IMAGE_TYPE:
         description: "IMAGE 格式"
         required: true
@@ -39,6 +39,7 @@ jobs:
         uses: actions/checkout@main
         with:
           repository: Kyuofox/Action_Build_Marble_ROM
+          ref: android15
           token: ${{ secrets.PRIVATE_TOKEN }}
       - name: 准备所需环境
         run: |
