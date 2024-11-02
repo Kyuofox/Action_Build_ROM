@@ -44,7 +44,7 @@ jobs:
       - name: 准备所需环境
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
-          sudo apt-get install python3 python3-pip aria2 p7zip-full zstd
+          sudo apt-get install python3 python3-pip aria2 p7zip-full zstd fuse3
       - name: 构建 ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} $GITHUB_ENV $GITHUB_WORKSPACE
