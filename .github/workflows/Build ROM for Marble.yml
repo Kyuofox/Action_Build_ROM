@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@main
         with:
           repository: Kyuofox/Action_Build_Marble_ROM
-          ref: android15
+          ref: android14
           token: ${{ secrets.PRIVATE_TOKEN }}
       - name: 准备所需环境
         run: |
