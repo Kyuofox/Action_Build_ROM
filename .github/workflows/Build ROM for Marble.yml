@@ -8,7 +8,7 @@ on:
       VENDOR_URL:
         description: "底包下载地址"
         required: true
-        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS2.0.209.0.VMRCNXM/marble-ota_full-OS2.0.209.0.VMRCNXM-user-15.0-e346f9d7f7.zip'
+        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS2.0.210.0.VMRCNXM/marble-ota_full-OS2.0.210.0.VMRCNXM-user-15.0-f5d6ffba6e.zip'
       IMAGE_TYPE:
         description: "IMAGE 格式"
         required: true
