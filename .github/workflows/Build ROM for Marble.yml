@@ -9,18 +9,6 @@ on:
         description: "底包下载地址"
         required: true
         default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS3.0.1.0.VMRCNXM/marble-ota_full-OS3.0.1.0.VMRCNXM-user-15.0-ac8e5cc1cc.zip'
-      IMAGE_TYPE:
-        description: "IMAGE 格式"
-        required: true
-        default: 'erofs'
-        type: choice
-        options:
-        - erofs
-        - ext4
-      EXT_RW:
-        description: 'EXT4 可读写'
-        required: true
-        type: boolean
       DECRYPTION:
         description: '去除强制加密'
         required: true
@@ -29,10 +17,17 @@ on:
         description: '启用完美图标'
         required: true
         type: boolean
-      UPLOAD_ONEDRIVE:
-        description: '是否上传到 OneDrive'
+      GithubRelease:
+        description: "Github Release"
         required: true
         type: boolean
+        default: true
+      OneDrive:
+        description: "OneDrive"
+        required: true
+        type: boolean
+        default: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,18 +44,14 @@ jobs:
           remove-codeql: 'true'
       - name: 检出仓库文件
         uses: actions/checkout@main
-        with:
-          repository: Kyuofox/Action_Build_Marble_ROM
-          ref: android16
-          token: ${{ secrets.PRIVATE_TOKEN }}
       - name: 准备所需环境
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
-          sudo apt-get install python3 python3-pip aria2 p7zip-full zstd fuse3
+          sudo apt-get install python3 aria2 p7zip-full zstd
           sudo pip install google protobuf
       - name: 构建 ROM
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} ${{ github.event.inputs.DECRYPTION }} ${{ github.event.inputs.PERFECTICON }} $GITHUB_ENV $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.DECRYPTION }} ${{ github.event.inputs.PERFECTICON }} $GITHUB_ENV $GITHUB_WORKSPACE
       - name: 处理 ROM
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
@@ -69,7 +60,8 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           touch file.log
           echo -e "移植机型: ${{ env.model }}\n\n底包版本: ${{ env.vendor_os_version }}\n底包安全补丁版本: ${{ env.vendor_security_patch }}\n底包基线版本: ${{ env.origin_base_line}}\n底包vendor基线版本: ${{ env.vendor_base_line}}\n\n移植包版本: ${{ env.port_os_version }}\n移植包安全补丁版本: ${{ env.port_security_patch }}\n移植包基线版本: ${{ env.port_base_line }}" > file.log
-      - name: 上传到 Github Release
+      - if: ${{ github.event.inputs.GithubRelease == 'true' }}
+        name: 上传到 Github Release
         uses: ncipollo/release-action@main
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
@@ -79,11 +71,11 @@ jobs:
           allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: 上传到 OneDrive
-        if: ${{ github.event.inputs.UPLOAD_ONEDRIVE == 'true' }}
+      - if: ${{ github.event.inputs.OneDrive == 'true' }}
+        name: 上传到 OneDrive
         run: |
           sudo -v ; curl https://rclone.org/install.sh | sudo bash
           mkdir -p ~/.config/rclone/
           echo ${{ secrets.RCLONE_CONFIG }} > base64.txt
           base64 --decode base64.txt > ~/.config/rclone/rclone.conf
-          rclone copy -P "$GITHUB_WORKSPACE"/zip/${{ env.rom_name }} odrive:/HyperOS-Porting
+          rclone copy -P "$GITHUB_WORKSPACE"/zip/${{ env.rom_name }} od:/HyperOS-Porting
