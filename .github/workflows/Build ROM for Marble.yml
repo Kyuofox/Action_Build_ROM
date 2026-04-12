@@ -44,7 +44,7 @@ jobs:
           remove-codeql: 'true'
       - name: 检出仓库文件
         uses: actions/checkout@main
-          with:
+        with:
           repository: Kyuofox/Action_Build_Marble_ROM
           ref: android16
           token: ${{ secrets.PRIVATE_TOKEN }}
