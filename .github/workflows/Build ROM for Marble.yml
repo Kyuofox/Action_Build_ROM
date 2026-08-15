@@ -48,6 +48,12 @@ jobs:
           repository: Kyuofox/Action_Build_Marble_ROM
           ref: android17
           token: ${{ secrets.PRIVATE_TOKEN }}
+      - name: 准备 Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@ed92fe6cadad69be94a966a7ee3271275e62f779 # v1.6.0
+        with:
+          ndk-version: r27d
+          add-to-path: false
       - name: 准备所需环境
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
@@ -55,7 +61,14 @@ jobs:
           sudo pip install google protobuf
       - name: 构建 ROM
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.DECRYPTION }} ${{ github.event.inputs.PERFECTICON }} $GITHUB_ENV $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/make.sh \
+            "${{ github.event.inputs.URL }}" \
+            "${{ github.event.inputs.VENDOR_URL }}" \
+            "${{ github.event.inputs.DECRYPTION }}" \
+            "${{ github.event.inputs.PERFECTICON }}" \
+            "$GITHUB_ENV" \
+            "$GITHUB_WORKSPACE" \
+            "${{ steps.setup-ndk.outputs.ndk-path }}"
       - name: 处理 ROM
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
