@@ -59,8 +59,9 @@ jobs:
       - name: 准备所需环境
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
-          sudo apt-get install python3 aria2 p7zip-full zstd
+          sudo apt-get install python3 aria2 curl patchelf p7zip-full zstd
           sudo pip install google protobuf
+          rustup target add aarch64-linux-android
       - name: 构建 ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/make.sh \
@@ -70,7 +71,8 @@ jobs:
             "${{ github.event.inputs.PERFECTICON }}" \
             "$GITHUB_ENV" \
             "$GITHUB_WORKSPACE" \
-            "${{ steps.setup-ndk.outputs.ndk-path }}"
+            "${{ steps.setup-ndk.outputs.ndk-path }}" \
+            "$(rustup which cargo)"
       - name: 处理 ROM
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
